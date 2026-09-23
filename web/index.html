@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en-IN">
+<head>
+  <base href="$FLUTTER_BASE_HREF">
+
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="description" content="EY FireShield AI — Fire Safety Compliance and Audit Platform">
+  <meta name="author" content="Ernst &amp; Young LLP">
+
+  <!-- ============================================================
+       PWA: Android Chrome installability
+  ============================================================ -->
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="application-name" content="FireShield AI">
+  <meta name="theme-color" content="#B71C1C" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#B71C1C" media="(prefers-color-scheme: dark)">
+
+  <!-- ============================================================
+       PWA: Apple iOS / iPadOS Safari
+  ============================================================ -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="FireShield AI">
+  <meta name="format-detection" content="telephone=no">
+
+  <!-- Apple touch icons (Safari uses these, not manifest icons) -->
+  <link rel="apple-touch-icon" href="icons/Icon-192.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="icons/Icon-192.png">
+  <link rel="apple-touch-icon" sizes="167x167" href="icons/Icon-192.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="icons/Icon-192.png">
+
+  <!-- Apple splash screens (prevents white flash during launch) -->
+  <!-- iPhone SE (1st gen) -->
+  <link rel="apple-touch-startup-image" media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2)" href="splash/apple-splash-640x1136.png">
+  <!-- iPhone 8 / SE 2nd gen -->
+  <link rel="apple-touch-startup-image" media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2)" href="splash/apple-splash-750x1334.png">
+  <!-- iPhone 8 Plus -->
+  <link rel="apple-touch-startup-image" media="(device-width: 414px) and (device-height: 736px) and (-webkit-device-pixel-ratio: 3)" href="splash/apple-splash-1242x2208.png">
+  <!-- iPhone X / XS / 11 Pro / 12 mini / 13 mini -->
+  <link rel="apple-touch-startup-image" media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3)" href="splash/apple-splash-1125x2436.png">
+  <!-- iPhone XS Max / XR / 11 / 11 Pro Max -->
+  <link rel="apple-touch-startup-image" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3)" href="splash/apple-splash-1242x2688.png">
+  <!-- iPhone 12 / 13 / 14 -->
+  <link rel="apple-touch-startup-image" media="(device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3)" href="splash/apple-splash-1170x2532.png">
+  <!-- iPhone 12 Pro Max / 13 Pro Max / 14 Plus -->
+  <link rel="apple-touch-startup-image" media="(device-width: 428px) and (device-height: 926px) and (-webkit-device-pixel-ratio: 3)" href="splash/apple-splash-1284x2778.png">
+  <!-- iPhone 14 Pro -->
+  <link rel="apple-touch-startup-image" media="(device-width: 393px) and (device-height: 852px) and (-webkit-device-pixel-ratio: 3)" href="splash/apple-splash-1179x2556.png">
+  <!-- iPhone 14 Pro Max -->
+  <link rel="apple-touch-startup-image" media="(device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3)" href="splash/apple-splash-1290x2796.png">
+  <!-- iPad Mini / Air (portrait) -->
+  <link rel="apple-touch-startup-image" media="(device-width: 768px) and (device-height: 1024px) and (-webkit-device-pixel-ratio: 2)" href="splash/apple-splash-1536x2048.png">
+  <!-- iPad Pro 11" -->
+  <link rel="apple-touch-startup-image" media="(device-width: 834px) and (device-height: 1194px) and (-webkit-device-pixel-ratio: 2)" href="splash/apple-splash-1668x2388.png">
+  <!-- iPad Pro 12.9" -->
+  <link rel="apple-touch-startup-image" media="(device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2)" href="splash/apple-splash-2048x2732.png">
+
+  <!-- Standard favicon -->
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/Icon-192.png">
+
+  <!-- PWA manifest -->
+  <link rel="manifest" href="manifest.json">
+
+  <title>FireShield AI | EY</title>
+
+  <style>
+    /* Prevent white flash — match app splash colour */
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: #0D0D1A;
+      height: 100%;
+      overflow: hidden;
+      /* Safe area insets for iPhone notch / Dynamic Island */
+      padding-top: env(safe-area-inset-top);
+      padding-bottom: env(safe-area-inset-bottom);
+    }
+    #splash {
+      position: fixed;
+      inset: 0;
+      background: #0D0D1A;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      transition: opacity 0.4s ease;
+    }
+    #splash.hidden { opacity: 0; pointer-events: none; }
+    #splash-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 24px;
+    }
+    #splash-ey {
+      background: #FFE600;
+      color: #111;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-weight: 900;
+      font-size: 18px;
+      padding: 4px 10px;
+      border-radius: 6px;
+      letter-spacing: -0.5px;
+    }
+    #splash-name {
+      color: #fff;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-weight: 700;
+      font-size: 20px;
+      letter-spacing: -0.3px;
+    }
+    #splash-sub {
+      color: rgba(255,255,255,0.4);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size: 11px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 0.4; }
+      50% { opacity: 1; }
+    }
+    #splash-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: #B71C1C;
+      margin-top: 32px;
+      animation: pulse 1.2s ease-in-out infinite;
+    }
+  </style>
+</head>
+<body>
+  <!-- Native-feel splash (hidden once Flutter loads) -->
+  <div id="splash">
+    <div id="splash-logo">
+      <span id="splash-ey">EY</span>
+      <span id="splash-name">FireShield AI</span>
+    </div>
+    <div id="splash-sub">Fire Safety Compliance Platform</div>
+    <div id="splash-dot"></div>
+  </div>
+
+  <script>
+    // Register service worker for offline support
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('flutter_service_worker.js', { scope: './' })
+          .then(reg => console.log('[SW] Registered, scope:', reg.scope))
+          .catch(err => console.warn('[SW] Registration failed:', err));
+      });
+    }
+
+    // Hide splash once Flutter signals it is ready
+    window.addEventListener('flutter-first-frame', () => {
+      const splash = document.getElementById('splash');
+      if (splash) {
+        splash.classList.add('hidden');
+        setTimeout(() => splash.remove(), 500);
+      }
+    });
+  </script>
+
+  <!-- In-browser CLIPSeg equipment detector (progressive enhancement).
+       Defines window.fsClipsegSupported / window.fsDetectEquipment; the model
+       is lazy-loaded on first use so this does not delay app start. -->
+  <script src="clipseg/fireseg.js" defer></script>
+
+  <script src="flutter_bootstrap.js" async></script>
+</body>
+</html>

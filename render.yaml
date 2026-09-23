@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: fireshield-floorplan-api
+    runtime: docker
+    plan: free
+    region: singapore
+    rootDir: worker/floorplan
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    healthCheckPath: /health
+    envVars:
+      - key: FLOORPLAN_SERVICE_TOKEN
+        sync: false
+      - key: ENABLE_NONCOMMERCIAL_CUBICASA
+        value: "0"

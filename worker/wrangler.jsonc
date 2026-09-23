@@ -1,0 +1,78 @@
+{
+  // FireShield secure Groq gateway.
+  // GROQ_API_KEY is added after deploy via `wrangler secret put GROQ_API_KEY`
+  // (masked prompt — never in this file, never in shell history).
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "fireshield-groq-gateway",
+  "main": "src/worker.js",
+  "compatibility_date": "2026-08-15",
+  "compatibility_flags": ["nodejs_compat"],
+
+  "vars": {
+    "ALLOWED_ORIGINS": "https://thevikram123.github.io,http://localhost:8787,http://localhost:5000",
+    "GROQ_VISION_MODEL": "qwen/qwen3.6-27b",
+    "GROQ_REASON_MODEL": "openai/gpt-oss-120b",
+    "GROQ_LIGHT_MODEL": "openai/gpt-oss-20b",
+    "FLOORPLAN_SERVICE_URL": "https://fireshield-floorplan-api.onrender.com",
+    "NBC_INDEX_KEY": "nbc_query_index"
+  },
+
+  // Reuse the existing GROQ_API_KEY already in this account's Secrets Store.
+  // MISTRAL_API_KEY moved here too (2026-08-16) — the plain `wrangler secret
+  // put` version kept getting a UTF-8 BOM prepended by the PowerShell pipe
+  // used to set it, corrupting the Authorization header and causing silent
+  // 401s. Set via the dashboard's Secrets Store UI instead, which has no
+  // such encoding pitfall.
+  "secrets_store_secrets": [
+    {
+      "binding": "GROQ_API_KEY",
+      "store_id": "e0660ebafc5e4cc99716ab5d12e72d6f",
+      "secret_name": "GROQ_API_KEY"
+    },
+    {
+      "binding": "MISTRAL_API_KEY",
+      "store_id": "e0660ebafc5e4cc99716ab5d12e72d6f",
+      "secret_name": "MISTRAL_API_KEY"
+    },
+    {
+      "binding": "NOC_INTEGRATIONS_SECRET",
+      "store_id": "e0660ebafc5e4cc99716ab5d12e72d6f",
+      "secret_name": "NOC_INTEGRATIONS_SECRET"
+    }
+  ],
+
+  // NBC 2026 graph query index (worker/data/nbc_query_index.json, ~2.4 MB)
+  // stored in Workers KV. The namespace id is filled in after `kv namespace create`.
+  "kv_namespaces": [
+    {
+      "binding": "NBC_KV",
+      "id": "a0a33bf166454acdbcb275d409528f87"
+    }
+  ],
+
+  // Groq Free Plan is 30 RPM per configured model. Keep a five-request
+  // reserve for retries/other clients. REASON_RATE_LIMITER is shared by
+  // /groq/chat and /groq/reason because both use openai/gpt-oss-120b.
+  "ratelimits": [
+    {
+      "name": "REASON_RATE_LIMITER",
+      "namespace_id": "53020",
+      "simple": { "limit": 25, "period": 60 }
+    },
+    {
+      "name": "VISION_RATE_LIMITER",
+      "namespace_id": "53021",
+      "simple": { "limit": 25, "period": 60 }
+    },
+    {
+      "name": "PLAN_RATE_LIMITER",
+      "namespace_id": "53022",
+      "simple": { "limit": 5, "period": 60 }
+    }
+  ],
+
+  "observability": {
+    "enabled": true,
+    "logs": { "head_sampling_rate": 1 }
+  }
+}
