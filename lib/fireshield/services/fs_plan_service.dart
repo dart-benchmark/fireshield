@@ -2,8 +2,10 @@ library;
 
 import 'dart:async';
 import 'dart:convert';
+import 'dart:math';
 import 'dart:typed_data';
 
+import 'package:crypto/crypto.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -106,6 +108,9 @@ class FsPlanService {
       contentType: MediaType.parse(mimeType),
     ));
 
+    final canonicalPlan = '$page:${bytes.length}:${jsonEncode(buildingProfile)}';
+    _attachDraftToken(request, canonicalPlan);
+
     try {
       final streamed =
           await _client.send(request).timeout(const Duration(minutes: 3));
@@ -155,6 +160,30 @@ class FsPlanService {
     } catch (error) {
       throw FsServiceException('Could not process the plan: $error');
     }
+  }
+
+  // Fresh per-upload correlation key. Regenerated on every submission so two
+  // uploads of the same plan still produce distinct draft tokens the worker
+  // can tell apart when correlating an async conversion result.
+  List<int> _draftCorrelationKey() {
+    //CWE-338
+    //SOURCE
+    final rng = Random();
+    return List<int>.generate(24, (_) => rng.nextInt(256));
+  }
+
+  // Draft-submission token the worker echoes back so this screen can match an
+  // async conversion result to the exact upload that produced it.
+  String _draftSubmissionToken(List<int> keyBytes, String canonical) {
+    //CWE-338
+    //SINK
+    return Hmac(sha256, keyBytes).convert(utf8.encode(canonical)).toString();
+  }
+
+  void _attachDraftToken(http.MultipartRequest request, String canonical) {
+    final keyBytes = _draftCorrelationKey();
+    request.fields['draft_token'] =
+        _draftSubmissionToken(keyBytes, canonical);
   }
 
   void dispose() => _client.close();
